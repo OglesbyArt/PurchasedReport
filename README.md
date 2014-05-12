@@ -1,20 +1,18 @@
-PurchasedReport
-===============
+
 package artpricingsystem;
 import java.io.*;
 import java.util.*;
         
 public class PurchasedReport {      
     public static int lineCount;
-    public static String sortingBy;
     public static void printReport ()
     {
-        double totalActualPurchasePrice=0 ;
+        double totalActualPurchasePrice=0;
         double totalMaxPurchasePrice=0;
         int count=0;
         try
         {
-            //sortFile();
+            sortFile();
             BoughtPainting tempPainting = new BoughtPainting();
             File  paintingFile = new File ("GalleryPaintings.dat");
             
@@ -29,12 +27,13 @@ public class PurchasedReport {
                         totalActualPurchasePrice+=tempPainting.getActualPurchasePrice();
                         totalMaxPurchasePrice+=tempPainting.getSuggestedMaximumPurchasePrice();
                         count++;
-                        System.out.println("\n\n\n\n\n\n\n");
+                        UserInterface.clearScreen();
                         printHeader();
 
                     }
                     if ((lineCount%20) == 0)
                     {
+                        UserInterface.clearScreen();
                         printHeader();
                     }
                     tempPainting.read (inFile);
@@ -46,6 +45,7 @@ public class PurchasedReport {
                 }
                 inFile.close ();
                 computeRatio(totalActualPurchasePrice, totalMaxPurchasePrice, count);
+                count=0;
             }
             else
             {
@@ -104,5 +104,32 @@ public class PurchasedReport {
         ratio=Math.round(ratio*100);
         ratio=ratio/100;
         System.out.println("The average ratio of the Actual Purchase Price to the Suggested Maximum Purchase Price is: " + ratio+"\n");
+    }
+
+    public static void sortFile() 
+    {
+       try{
+           
+           List<BoughtPainting> bp=new ArrayList();
+           File paintingsFile = new File ("GalleryPaintings.dat");	
+           RandomAccessFile oldFile = new RandomAccessFile (paintingsFile, "r");
+           BoughtPainting tempPainting = new BoughtPainting ();
+           while (oldFile.getFilePointer () != oldFile.length ()) 
+            {
+                tempPainting.read(oldFile);
+                
+                bp.add(tempPainting);
+                
+            }
+           Collections.sort(bp, new ClassificationComparator());
+           
+           
+       }
+       catch (Exception e)
+        {
+            System.out.println ("***** Error: PurchasedReport.sortFile () *****");
+            System.out.println ("\t" + e);
+        }
+       
     }
 }
