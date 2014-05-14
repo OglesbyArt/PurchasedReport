@@ -2,8 +2,8 @@
 package artpricingsystem;
 import java.io.*;
 import java.util.*;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
         
 public class PurchasedReport {      
     public static int lineCount;
@@ -14,7 +14,7 @@ public class PurchasedReport {
         int count=0;
         try
         {
-            //sortFile();
+            sortFile();
             BoughtPainting tempPainting = new BoughtPainting();
             File  paintingFile = new File ("GalleryPaintings.dat");
             
@@ -107,43 +107,49 @@ public class PurchasedReport {
         ratio=ratio/100;
         System.out.println("The average ratio of the Actual Purchase Price to the Suggested Maximum Purchase Price is: " + ratio+"\n");
     }
-
-    /*public static void sortFile() 
+    
+    public static void sortFile() 
     {
        try{
-           ArrayList <BoughtPainting> bp=new ArrayList();
-           File paintingsFile = new File ("GalleryPaintings.dat");	
+           List<BoughtPainting> bp= new ArrayList<BoughtPainting>();
+           File paintingsFile = new File ("GalleryPaintings.dat");
+           File  tempPaintingsFile = new File ("Reports.dat");
+           tempPaintingsFile.delete();
            RandomAccessFile oldFile = new RandomAccessFile (paintingsFile, "r");
-           BoughtPainting tempPainting = new BoughtPainting ();
-           BoughtPainting tempPainting2= new BoughtPainting ();
+           //Reads in File to Array 
            while (oldFile.getFilePointer () != oldFile.length ()) 
            {
+                BoughtPainting tempPainting = new BoughtPainting ();
                 tempPainting.read(oldFile);
-                tempPainting.print();
                 bp.add(tempPainting);
-                tempPainting2.read(oldFile);
-                tempPainting2.print();
-                bp.add(tempPainting2);
-           }     
-                    /*bp.add(tempPainting);
-                int i=0;
-                while(i<3)
-                {   
-                    System.out.println(bp);
-                    tempPainting.updateClassification();
-                    tempPainting.updateDateOfPurchase();
-                    ++i;
-                    bp.add(tempPainting);
-                }                    
-            //}  
-           Collections.sort(bp, BoughtPainting.comparator); 
-           bp.stream();
+           } 
+           oldFile.close ();
+           //Sorts the Array
+           Collections.sort(bp,new Comparator<BoughtPainting>() {
+           @Override
+            public int compare(BoughtPainting  bp1, BoughtPainting  bp2)
+            {
+                int result=bp1.getClassification().compareTo(bp2.getClassification());
+                if(result!=0)
+                     return result;
+                else if (result==0)    
+                    result=bp1.getDateOfPurchase().compareTo(bp2.getDateOfPurchase());
+                return result;
+            }
+            });
+           //Writes Array to File
+           RandomAccessFile newFile = new RandomAccessFile (tempPaintingsFile, "rw");
+            for(int j=0;j<bp.size();++j) 
+            {
+                BoughtPainting tempPainting = new BoughtPainting ();
+                tempPainting=bp.get(j);
+                tempPainting.write(newFile);
+            }
        }
        catch (Exception e)
         {
             System.out.println ("***** Error: PurchasedReport.sortFile () *****");
             System.out.println ("\t" + e);
         }
-       
-    }*/
+    }
 }
