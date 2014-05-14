@@ -2,6 +2,8 @@
 package artpricingsystem;
 import java.io.*;
 import java.util.*;
+import java.util.Comparator;
+import java.util.Collections;
         
 public class PurchasedReport {      
     public static int lineCount;
@@ -12,7 +14,7 @@ public class PurchasedReport {
         int count=0;
         try
         {
-            sortFile();
+            //sortFile();
             BoughtPainting tempPainting = new BoughtPainting();
             File  paintingFile = new File ("GalleryPaintings.dat");
             
@@ -23,25 +25,23 @@ public class PurchasedReport {
                 {
                     if (((lineCount%20) == 0) && (lineCount!=0))
                     {
-                        printRecord(tempPainting);
-                        totalActualPurchasePrice+=tempPainting.getActualPurchasePrice();
-                        totalMaxPurchasePrice+=tempPainting.getSuggestedMaximumPurchasePrice();
-                        count++;
-                        UserInterface.clearScreen();
+                        System.out.println("\n\n\n\n");
                         printHeader();
 
                     }
                     if ((lineCount%20) == 0)
                     {
-                        UserInterface.clearScreen();
                         printHeader();
                     }
                     tempPainting.read (inFile);
                     printRecord(tempPainting);
-                    totalActualPurchasePrice+=tempPainting.getActualPurchasePrice();
-                    totalMaxPurchasePrice+=tempPainting.getSuggestedMaximumPurchasePrice();
-                    count++;
-                    
+                    boolean printed=printRecord(tempPainting);
+                        if(printed)
+                        {
+                            totalActualPurchasePrice+=tempPainting.getActualPurchasePrice();
+                            totalMaxPurchasePrice+=tempPainting.getSuggestedMaximumPurchasePrice();
+                            count++;
+                        }
                 }
                 inFile.close ();
                 computeRatio(totalActualPurchasePrice, totalMaxPurchasePrice, count);
@@ -63,7 +63,7 @@ public class PurchasedReport {
         }
     } 
     
-    public static void printRecord (BoughtPainting b)
+    public static boolean printRecord (BoughtPainting b)
     {
         Date today=new Date();
         Calendar calendar = Calendar.getInstance();
@@ -79,7 +79,9 @@ public class PurchasedReport {
                 System.out.printf ("%-35s\n", true);  
             else System.out.printf ("%-35s\n",false);  
             ++lineCount;
+            return true;
         }
+        return false;
     }
     
     public static void printHeader()
@@ -106,24 +108,36 @@ public class PurchasedReport {
         System.out.println("The average ratio of the Actual Purchase Price to the Suggested Maximum Purchase Price is: " + ratio+"\n");
     }
 
-    public static void sortFile() 
+    /*public static void sortFile() 
     {
        try{
-           
-           List<BoughtPainting> bp=new ArrayList();
+           ArrayList <BoughtPainting> bp=new ArrayList();
            File paintingsFile = new File ("GalleryPaintings.dat");	
            RandomAccessFile oldFile = new RandomAccessFile (paintingsFile, "r");
            BoughtPainting tempPainting = new BoughtPainting ();
+           BoughtPainting tempPainting2= new BoughtPainting ();
            while (oldFile.getFilePointer () != oldFile.length ()) 
-            {
+           {
                 tempPainting.read(oldFile);
-                
+                tempPainting.print();
                 bp.add(tempPainting);
-                
-            }
-           Collections.sort(bp, new ClassificationComparator());
-           
-           
+                tempPainting2.read(oldFile);
+                tempPainting2.print();
+                bp.add(tempPainting2);
+           }     
+                    /*bp.add(tempPainting);
+                int i=0;
+                while(i<3)
+                {   
+                    System.out.println(bp);
+                    tempPainting.updateClassification();
+                    tempPainting.updateDateOfPurchase();
+                    ++i;
+                    bp.add(tempPainting);
+                }                    
+            //}  
+           Collections.sort(bp, BoughtPainting.comparator); 
+           bp.stream();
        }
        catch (Exception e)
         {
@@ -131,5 +145,5 @@ public class PurchasedReport {
             System.out.println ("\t" + e);
         }
        
-    }
+    }*/
 }
